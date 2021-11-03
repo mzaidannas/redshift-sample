@@ -1,0 +1,63 @@
+version: '3.7'
+
+# To access data postgres, redis and elasticsearch writes within container from host machine
+volumes:
+  postgres_data: {}
+  # redis_data: {}
+  # elasticsearch_data: {}
+
+services:
+  postgres:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # redis:
+  #   image: redis:alpine
+  #   restart: always
+  #   volumes:
+  #     - redis_data:/data
+  #   ports:
+  #     - "6379:6379"
+
+  # memcached:
+  #   image: memcached:alpine
+  #   restart: always
+  #   ports:
+  #     - "11211:11211"
+
+  # elasticsearch:
+  #   image: blacktop/elasticsearch
+  #   restart: always
+  #   volumes:
+  #     - elasticsearch_data:/usr/share/elasticsearch/data
+  #   ports:
+  #     - "9200:9200"
+  #     - "9300:9300"
+
+  app:
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        JOOBY_ENV: ${JOOBY_ENV:-development}
+    image: tie_api_app
+    depends_on:
+      - postgres
+      # - redis
+      # - memcached
+      # - elasticsearch
+    environment:
+      JOOBY_ENV: ${JOOBY_ENV:-development}
+    env_file: .env
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/var/www/redshift-sample

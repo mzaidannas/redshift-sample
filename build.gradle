@@ -1,0 +1,69 @@
+buildscript {
+  ext {
+    joobyVersion = "2.11.0"
+  }
+}
+
+plugins {
+  id "application"
+  id "io.jooby.openAPI" version "${joobyVersion}"
+  id "io.jooby.run" version "${joobyVersion}"
+  id "io.spring.dependency-management" version "1.0.11.RELEASE"
+  id "com.google.osdetector" version "1.7.0"
+  id "com.github.johnrengelman.shadow" version "7.0.0"
+}
+
+group "app"
+version "1.0.0"
+mainClassName = "app.App"
+sourceCompatibility = 17
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "io.jooby:jooby-bom:$joobyVersion"
+  }
+}
+
+dependencies {
+  annotationProcessor "io.jooby:jooby-apt"
+  implementation "io.jooby:jooby-utow"
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.14.1'
+  // postgresql
+  implementation 'com.github.jasync-sql:jasync-postgresql:2.0.0'
+
+  testImplementation "org.junit.jupiter:junit-jupiter-api"
+  testImplementation "org.junit.jupiter:junit-jupiter-engine"
+  testImplementation "io.jooby:jooby-test"
+  testImplementation "com.squareup.okhttp3:okhttp"
+}
+
+test {
+  useJUnitPlatform()
+}
+
+/** Java debug information: */
+tasks.withType(JavaCompile) {
+  options.compilerArgs += [
+    '-parameters',
+    '-Ajooby.incremental=true',
+    '-Ajooby.services=true',
+    '-Ajooby.debug=false'
+  ]
+  options.debug = true
+}
+
+
+shadowJar {
+  mergeServiceFiles()
+}
+
+joobyRun.dependsOn openAPI
+
+jar.dependsOn openAPI

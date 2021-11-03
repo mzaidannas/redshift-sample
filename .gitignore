@@ -1,0 +1,10 @@
+tmp
+.env
+logs
+build
+bin
+.gradle
+
+# IDE settings
+.vscode
+.idea
