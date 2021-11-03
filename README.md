@@ -14,3 +14,7 @@ Welcome to redshift-sample!!
 
      docker build . -t redshift-sample
      docker run -p 8080:8080 -it redshift-sample
+
+## docker-compose
+
+     docker-compose up --build
