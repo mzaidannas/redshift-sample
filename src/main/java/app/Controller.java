@@ -9,6 +9,7 @@ import com.github.jasync.sql.db.pool.ConnectionPool;
 import com.github.jasync.sql.db.postgresql.PostgreSQLConnection;
 import com.github.jasync.sql.db.postgresql.pool.PostgreSQLConnectionFactory;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +25,7 @@ public class Controller {
   private static Logger logger = LoggerFactory.getLogger(Controller.class);
 
   @GET
-  public CompletableFuture<String> sayHi() throws ExecutionException, InterruptedException {
+  public CompletableFuture<List<String>> sayHi() throws ExecutionException, InterruptedException {
     Configuration configuration = new Configuration("postgres", "localhost", 5432, "password", "jooby_development");
     ConnectionPoolConfiguration connectionPoolConfiguration = new ConnectionPoolConfiguration("localhost", 5432,
         "jooby_development", "postgres", "password", 20, // maxActiveConnections,
@@ -35,10 +36,13 @@ public class Controller {
     ConnectionPool<PostgreSQLConnection> connection = new ConnectionPool<>(
         new PostgreSQLConnectionFactory(configuration), connectionPoolConfiguration);
     connection.connect().get();
-    final CompletableFuture<QueryResult> future = connection.sendPreparedStatement("SELECT * FROM users LIMIT 2");
-    return future.thenApply(t -> {
-      logger.debug("Name: " + t.getRows().get(0).get(0) + " Email: " + t.getRows().get(0).get(1));
-      return "Name: " + t.getRows().get(0).get(0) + " Email: " + t.getRows().get(0).get(1);
-    });
+    final CompletableFuture<QueryResult> future = connection
+        .sendPreparedStatement("SELECT name, email FROM users LIMIT 2");
+    return future.thenApply(t ->
+      t.getRows().stream().map(row -> {
+        logger.debug(String.format("Name: %s Email: %s", row.get("name"), row.get("email")));
+        return String.format("Name: %s Email: %s", row.get("name"), row.get("email"));
+      }).toList()
+    );
   }
 }

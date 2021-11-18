@@ -3,7 +3,7 @@ version: '3.7'
 # To access data postgres, redis and elasticsearch writes within container from host machine
 volumes:
   postgres_data: {}
-  # redis_data: {}
+  redis_data: {}
   # elasticsearch_data: {}
 
 services:
@@ -11,19 +11,21 @@ services:
     image: postgres:alpine
     restart: always
     environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-jooby_development}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
-  # redis:
-  #   image: redis:alpine
-  #   restart: always
-  #   volumes:
-  #     - redis_data:/data
-  #   ports:
-  #     - "6379:6379"
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
 
   # memcached:
   #   image: memcached:alpine
@@ -51,7 +53,7 @@ services:
     image: tie_api_app
     depends_on:
       - postgres
-      # - redis
+      - redis
       # - memcached
       # - elasticsearch
     environment:
