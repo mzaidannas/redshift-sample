@@ -28,8 +28,7 @@ public class Controller {
 
   @GET
   public CompletableFuture<List<String>> sayHi() {
-    Connection connection = new Connection();
-    final CompletableFuture<QueryResult> future = connection.getConnection()
+    final CompletableFuture<QueryResult> future = Connection.getConnection()
         .thenCompose(conn -> conn.sendPreparedStatement("SELECT * FROM users"));
 
     Gson gson = new GsonBuilder()

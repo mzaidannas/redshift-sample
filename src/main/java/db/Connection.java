@@ -14,19 +14,18 @@ import io.jooby.Environment;
 import io.jooby.EnvironmentOptions;
 
 public class Connection {
-  private ConnectionPool<PostgreSQLConnection> connection;
-  private Config config;
+  private static ConnectionPool<PostgreSQLConnection> connection;
+  private static Config config = Environment.loadEnvironment(new EnvironmentOptions()).getConfig();
 
-  public Connection() {
-    config = Environment.loadEnvironment(new EnvironmentOptions()).getConfig();
-    Configuration configuration = new Configuration(
+  static {
+    final Configuration configuration = new Configuration(
       config.getString("database.username"),
       config.getString("database.host"),
       config.getInt("database.port"),
       config.getString("database.password"),
       config.getString("database.dbname")
     );
-    ConnectionPoolConfiguration connectionPoolConfiguration = new ConnectionPoolConfiguration(
+    final ConnectionPoolConfiguration connectionPoolConfiguration = new ConnectionPoolConfiguration(
       config.getString("database.host"),
       config.getInt("database.port"),
       config.getString("database.dbname"),
@@ -41,7 +40,9 @@ public class Connection {
         new PostgreSQLConnectionFactory(configuration), connectionPoolConfiguration);
   }
 
-  public CompletableFuture<com.github.jasync.sql.db.Connection> getConnection() {
+  public static CompletableFuture<com.github.jasync.sql.db.Connection> getConnection() {
     return connection.connect();
   }
+
+  private Connection(){}
 }
