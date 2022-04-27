@@ -1,9 +1,10 @@
-FROM gradle:7.2.0-jdk17 as build
+FROM gradle:7.4.2-alpine as build
 WORKDIR /redshift-sample
 COPY build.gradle build.gradle
 COPY settings.gradle settings.gradle
-COPY src src
+RUN gradle --write-verification-metadata sha256 help
 COPY conf conf
+COPY src src
 RUN gradle shadowJar
 
 FROM ghcr.io/graalvm/graalvm-ce:latest as package

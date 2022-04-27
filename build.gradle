@@ -31,12 +31,13 @@ dependencyManagement {
 
 dependencies {
   annotationProcessor "io.jooby:jooby-apt"
-  implementation "io.jooby:jooby-utow"
+  implementation "io.jooby:jooby-netty"
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.14.1'
   // postgresql
   implementation 'com.github.jasync-sql:jasync-postgresql:2.0.0'
+  implementation 'com.google.code.gson:gson:2.9.0'
 
   testImplementation "org.junit.jupiter:junit-jupiter-api"
   testImplementation "org.junit.jupiter:junit-jupiter-engine"
