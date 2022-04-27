@@ -9,14 +9,16 @@ import com.github.jasync.sql.db.pool.ConnectionPool;
 import com.github.jasync.sql.db.postgresql.PostgreSQLConnection;
 import com.github.jasync.sql.db.postgresql.pool.PostgreSQLConnectionFactory;
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
+
+import io.jooby.Environment;
+import io.jooby.EnvironmentOptions;
 
 public class Connection {
   private ConnectionPool<PostgreSQLConnection> connection;
   private Config config;
 
   public Connection() {
-    config = ConfigFactory.load();
+    config = Environment.loadEnvironment(new EnvironmentOptions()).getConfig();
     Configuration configuration = new Configuration(
       config.getString("database.username"),
       config.getString("database.host"),
